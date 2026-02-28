@@ -1,0 +1,317 @@
+/* === LEVEL 4 PAGE === */
+
+body.level4 {
+  min-height: 100vh;
+  margin: 0;
+  background: radial-gradient(circle at top, #020617 0%, #020617 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+.l4-wrapper {
+  width: min(780px, 95vw);
+  padding: 32px 30px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.96);
+  box-shadow:
+    0 0 32px rgba(15, 23, 42, 0.9),
+    inset 0 0 20px rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+}
+
+.l4-wrapper h1 {
+  text-align: center;
+  font-size: 1.4rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  color: #e5e7eb;
+}
+
+.l4-sub {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.l4-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #67e8f9;
+  margin-bottom: 22px;
+}
+
+/* primes display */
+
+.prime-box {
+  margin-bottom: 16px;
+}
+
+.prime-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: #e5e7eb;
+}
+
+.prime-label {
+  color: #9ca3af;
+}
+
+.prime-value {
+  font-weight: 500;
+}
+
+.prime-value.corrupted {
+  color: #f97373;
+  position: relative;
+}
+
+/* glitch animation for corrupted q */
+
+.prime-value.glitching::before,
+.prime-value.glitching::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.prime-value.glitching::before {
+  color: #fecaca;
+  animation: primeGlitchTop 1.4s infinite linear alternate-reverse;
+}
+
+.prime-value.glitching::after {
+  color: #f97373;
+  animation: primeGlitchBottom 1.2s infinite linear alternate-reverse;
+}
+
+@keyframes primeGlitchTop {
+  0% {
+    clip-path: inset(0 0 60% 0);
+    transform: translate(-1px, -1px);
+  }
+  50% {
+    clip-path: inset(0 0 30% 0);
+    transform: translate(-2px, 1px);
+  }
+  100% {
+    clip-path: inset(0 0 50% 0);
+    transform: translate(-1px, 0px);
+  }
+}
+
+@keyframes primeGlitchBottom {
+  0% {
+    clip-path: inset(50% 0 0 0);
+    transform: translate(1px, 1px);
+  }
+  50% {
+    clip-path: inset(40% 0 0 0);
+    transform: translate(2px, -1px);
+  }
+  100% {
+    clip-path: inset(55% 0 0 0);
+    transform: translate(1px, 0px);
+  }
+}
+
+/* statuses */
+
+.prime-status {
+  font-size: 0.75rem;
+  margin-left: 4px;
+}
+
+.status-ok {
+  color: #4ade80;
+}
+
+.status-bad {
+  color: #f97373;
+}
+
+/* decrypt button */
+
+.decrypt-btn {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: 1px solid #38bdf8;
+  background: rgba(15, 23, 42, 0.9);
+  color: #e0f2fe;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.decrypt-btn:hover:not(:disabled) {
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+  background: rgba(15, 23, 42, 1);
+}
+
+.decrypt-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* log console */
+
+.log-box {
+  margin-top: 4px;
+  margin-bottom: 18px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #020617;
+  border: 1px solid #1f2937;
+  max-height: 160px;
+  overflow-y: auto;
+  font-size: 0.78rem;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+.log-line {
+  color: #9ca3af;
+  margin-bottom: 2px;
+}
+
+.log-line.log-error {
+  color: #fecaca;
+}
+
+.log-line.log-recovery {
+  color: #a5f3fc;
+}
+
+/* product input */
+
+.product-box {
+  font-size: 0.85rem;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+.product-label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.product-row {
+  display: flex;
+  gap: 8px;
+}
+
+#product-input {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #111827;
+  background: #020617;
+  color: #e5e7eb;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+#product-input:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+#product-submit {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  color: #e0f2fe;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#product-submit:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.25);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+#product-submit:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* product feedback */
+
+.product-feedback {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.product-feedback.ok {
+  color: #4ade80;
+}
+
+.product-feedback.error {
+  color: #f97373;
+}
+
+/* flag panel */
+
+.flag-panel {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(148, 163, 184, 0.4);
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.5s ease;
+}
+
+.flag-panel.hidden {
+  display: none;
+}
+
+.flag-panel.visible {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.flag-label {
+  font-size: 0.75rem;
+  color: #a5f3fc;
+  letter-spacing: 0.18em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.flag-box {
+  display: block;
+  margin: 0 auto 8px;
+  width: fit-content;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid #22c55e;
+  background: rgba(22, 101, 52, 0.2);
+  color: #bbf7d0;
+  font-size: 0.95rem;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+}
+
+.flag-note {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-align: center;
+}
