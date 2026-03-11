@@ -5,42 +5,63 @@
   <title>LEVEL 4 – NULL PRIME INTERFACE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/style.css" />
-  <link rel="icon" type="image/png" href="11zon_cropped.png">
+  <link rel="icon" type="image/png" href="11zon_cropped.png" />
 </head>
 <body class="level4">
-  <div class="l4-wrapper">
-    <h1>NULL PRIME DECRYPTION INTERFACE</h1>
+  <div class="noise-overlay"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
 
-    <p class="l4-sub">
-      well done making it this far.
-    </p>
-    <p class="l4-hint">
-      these two primes will unlock NULL's next clue.
-    </p>
+  <main class="l4-wrapper">
+    <div class="l4-header">
+      <div class="l4-tag">prime recovery channel // node 04</div>
+      <h1>NULL PRIME DECRYPTION INTERFACE</h1>
+      <p class="l4-sub">
+        well done making it this far.
+      </p>
+    </div>
 
-    <div class="prime-box">
+    <section class="prime-box">
       <div class="prime-row">
-        <span class="prime-label">p =</span>
+        <span class="prime-label">p</span>
+        <span class="prime-equals">=</span>
         <span id="prime-p" class="prime-value">539447</span>
         <span id="status-p" class="prime-status"></span>
       </div>
+
       <div class="prime-row">
-        <span class="prime-label">q =</span>
-        <span id="prime-q" class="prime-value corrupted">UNKNOWN</span>
+        <span class="prime-label">q</span>
+        <span class="prime-equals">=</span>
+        <span
+          id="prime-q"
+          class="prime-value corrupted"
+          data-text="UNKNOWN"
+        >UNKNOWN</span>
         <span id="status-q" class="prime-status"></span>
       </div>
+    </section>
+
+    <div class="action-row">
+      <button id="decrypt-btn" class="decrypt-btn" type="button">
+        initiate decryption
+      </button>
     </div>
 
-    <button id="decrypt-btn" class="decrypt-btn" type="button">
-      DECRYPT
-    </button>
+    <section class="console-shell">
+      <div class="console-header">
+        <span class="console-dot"></span>
+        <span class="console-dot"></span>
+        <span class="console-dot"></span>
+        <span class="console-title">system log</span>
+      </div>
+      <div id="log-box" class="log-box" aria-live="polite"></div>
+    </section>
 
-    <div id="log-box" class="log-box"></div>
-
-    <div class="product-box">
+    <section class="product-box">
       <label for="product-input" class="product-label">
         enter <code>p × q</code> (decimal)
       </label>
+
       <div class="product-row">
         <input
           id="product-input"
@@ -48,33 +69,32 @@
           autocomplete="off"
           spellcheck="false"
           disabled
+          placeholder="product locked until recovery sequence completes"
         />
         <button id="product-submit" type="button" disabled>
           submit
         </button>
       </div>
-      <div id="product-feedback" class="product-feedback"></div>
-    </div>
 
-    <div id="flag-panel" class="flag-panel hidden">
+      <div id="product-feedback" class="product-feedback"></div>
+    </section>
+
+    <section id="flag-panel" class="flag-panel hidden">
       <p class="flag-label">LEVEL 4 FLAG</p>
-      <div class="flag-box">
-        FLAG{PRIMES_WERE_CORRUPTED}
-      </div>
+      <div class="flag-box">FLAG{PRIMES_WERE_CORRUPTED}</div>
       <p class="flag-note">
         you repaired what NULL tried to break. the next node won’t be this forgiving.
       </p>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <script>
-    // simple SHA-256 via Web Crypto
     async function sha256(str) {
       const enc = new TextEncoder().encode(str);
       const buf = await crypto.subtle.digest("SHA-256", enc);
       const bytes = new Uint8Array(buf);
       return Array.from(bytes)
-        .map(b => b.toString(16).padStart(2, "0"))
+        .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
     }
 
@@ -91,16 +111,19 @@
       const flagPanel = document.getElementById("flag-panel");
 
       let nHashExpected = null;
+      let decryptStarted = false;
+      let isChecking = false;
 
-      // load hashes from JSON
       try {
         const res = await fetch("/data/level4.json");
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
         nHashExpected = (data.n_sha256 || "").toLowerCase();
+
+        if (!nHashExpected) throw new Error("Missing n_sha256");
       } catch (err) {
         console.error("failed to load level4.json:", err);
-        logBox.textContent = "CONFIG ERROR: unable to load hash data.";
+        appendLog("[CONFIG] unable to load verification data.", "error");
         decryptBtn.disabled = true;
         productInput.disabled = true;
         productSubmit.disabled = true;
@@ -115,47 +138,61 @@
         logBox.scrollTop = logBox.scrollHeight;
       }
 
+      function unlockProductInput() {
+        productInput.disabled = false;
+        productSubmit.disabled = false;
+        productInput.placeholder = "enter decimal product...";
+        productInput.focus();
+      }
+
       function runDecryptSequence() {
+        if (decryptStarted) return;
+        decryptStarted = true;
         decryptBtn.disabled = true;
+
         appendLog("[INIT] starting prime decryption sequence...");
         setTimeout(() => {
-          appendLog("[INFO] reading prime p...");
-        }, 600);
+          appendLog("[INFO] loading prime register p...");
+        }, 500);
 
         setTimeout(() => {
-          appendLog("[INFO] reading prime q...");
-        }, 1300);
+          appendLog("[INFO] loading prime register q...");
+        }, 1200);
 
         setTimeout(() => {
-          appendLog("[WARN] integrity mismatch detected for q.");
+          appendLog("[VERIFY] validating recovered prime set...");
+        }, 1900);
+
+        setTimeout(() => {
+          appendLog("[WARN] integrity mismatch detected for q.", "warn");
           primeQ.classList.add("glitching");
-        }, 2100);
+        }, 2600);
 
         setTimeout(() => {
-          appendLog("[ERROR] entropy overflow. prime q marked as CORRUPTED.", "error");
+          appendLog("[ERROR] entropy overflow. prime q marked as corrupted.", "error");
           statusP.textContent = "[ OK ]";
           statusP.classList.add("status-ok");
           statusQ.textContent = "[ CORRUPTED ]";
           statusQ.classList.add("status-bad");
-        }, 2900);
+        }, 3400);
 
         setTimeout(() => {
-          appendLog("[RECOVERY] searching backup nodes for intact q...");
-        }, 3700);
+          appendLog("[RECOVERY] searching backup nodes for intact q...", "recovery");
+        }, 4100);
 
         setTimeout(() => {
           appendLog("[RECOVERY] relay pointer: https://drive.google.com/YOUR_LEVEL5_LINK", "recovery");
-          appendLog("[HINT] recover prime q from the backup relay, then return here.");
-        }, 4600);
+        }, 4900);
 
         setTimeout(() => {
-          appendLog("[READY] product verification interface unlocked.");
-          productInput.disabled = false;
-          productSubmit.disabled = false;
-        }, 5200);
+          appendLog("[READY] product verification interface unlocked.", "ok");
+          unlockProductInput();
+        }, 5700);
       }
 
       async function checkProduct() {
+        if (isChecking) return;
+
         const raw = productInput.value.trim();
 
         if (!raw) {
@@ -163,39 +200,51 @@
           productFeedback.className = "product-feedback error";
           return;
         }
+
         if (!/^[0-9]+$/.test(raw)) {
           productFeedback.textContent = "only decimal digits are allowed.";
           productFeedback.className = "product-feedback error";
           return;
         }
 
+        isChecking = true;
         productInput.disabled = true;
         productSubmit.disabled = true;
         productFeedback.textContent = "verifying product...";
         productFeedback.className = "product-feedback";
 
-        const hash = (await sha256(raw)).toLowerCase();
+        try {
+          const hash = (await sha256(raw)).toLowerCase();
 
-        if (hash === nHashExpected) {
-          productFeedback.textContent = "correct product. access granted.";
-          productFeedback.className = "product-feedback ok";
-          flagPanel.classList.remove("hidden");
-          flagPanel.classList.add("visible");
-        } else {
-          productFeedback.textContent =
-            "incorrect product. this node rejects unstable keys.";
-          productFeedback.className = "product-feedback error";
-          productInput.disabled = false;
-          productSubmit.disabled = false;
+          if (hash === nHashExpected) {
+            productFeedback.textContent = "correct product. access granted.";
+            productFeedback.className = "product-feedback ok";
+
+            flagPanel.classList.remove("hidden");
+            flagPanel.classList.add("visible");
+
+            appendLog("[ACCESS] product verified. gateway unlocked.", "ok");
+          } else {
+            productFeedback.textContent =
+              "incorrect product. this node rejects unstable keys.";
+            productFeedback.className = "product-feedback error";
+
+            appendLog("[REJECT] submitted product failed verification.", "error");
+
+            productInput.disabled = false;
+            productSubmit.disabled = false;
+            productInput.focus();
+          }
+        } finally {
+          isChecking = false;
         }
       }
 
       decryptBtn.addEventListener("click", runDecryptSequence);
       productSubmit.addEventListener("click", checkProduct);
+
       productInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          checkProduct();
-        }
+        if (e.key === "Enter") checkProduct();
       });
     });
   </script>
